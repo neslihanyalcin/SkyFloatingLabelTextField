@@ -109,7 +109,12 @@ open class SkyFloatingLabelTextField: UITextField { // swiftlint:disable:this ty
         guard let placeholder = placeholder, let font = placeholderFont ?? font else {
             return
         }
-        let color = isEnabled ? placeholderColor : disabledColor
+        var color = UIColor()
+        if editingOrSelected {
+            color = .clear
+        } else {
+            color = isEnabled ? placeholderColor : disabledColor
+        }
         #if swift(>=4.2)
             attributedPlaceholder = NSAttributedString(
                 string: placeholder,
@@ -586,7 +591,7 @@ open class SkyFloatingLabelTextField: UITextField { // swiftlint:disable:this ty
      */
     open func isTitleVisible() -> Bool {
         if errorMessagePlacement == .default {
-            return hasText || hasErrorMessage || _titleVisible
+            return hasText || hasErrorMessage || _titleVisible || editingOrSelected
         } else {
             return hasText || _titleVisible
         }
@@ -597,6 +602,7 @@ open class SkyFloatingLabelTextField: UITextField { // swiftlint:disable:this ty
     }
 
     fileprivate func updateTitleVisibility(_ animated: Bool = false, completion: ((_ completed: Bool) -> Void)? = nil) {
+        updatePlaceholder()
         let alpha: CGFloat = isTitleVisible() ? 1.0 : 0.0
         let frame: CGRect = titleLabelRectForBounds(bounds, editing: isTitleVisible())
         let updateBlock = { () -> Void in
@@ -700,7 +706,7 @@ open class SkyFloatingLabelTextField: UITextField { // swiftlint:disable:this ty
         }
         let rect = CGRect(
             x: 0,
-            y: titleHeight(),
+            y: titleHeight() / 2,
             width: bounds.size.width,
             height: height
         )
